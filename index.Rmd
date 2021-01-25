@@ -1,7 +1,7 @@
 ---
-title: "Untitled"
+title: "A spatial analysis of well-being in London, UK"
 author: "Margaux"
-date: "02/12/2020"
+date: "10/01/2021"
 output: html_document
 ---
 
@@ -9,14 +9,44 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
+## Introduction
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+London is one of the least happy regions of the UK, despite having the highest per capita income, population density, and better health (Greater London Authority, 2012). This report addresses the need to consider an array of indicators to better represent and understand variation of well-being across urban space, to support targeted policy measures and enhance citizens’ lives. 
+This study was designed to examine the relationships between well-being scores in London wards and their median household income and population density, and examine these variables' potential to enhance the well-being measuring index. Linear regression models revealed positive and statistically significant associations between higher household income, lower population density and well-being scores. As Moran's I, revealed statistically significant clustering of the residuals of this model, a Geographically Weighted Regression (GWR) model was calculated, to adjust for underlying spatial processes within the data and investigate the geographic variation in the association between household income, population density and wellbeing. The GWR revealed that an increase in a household income was associated with a statistically significant increase of the well-being score. This therefore provides some support for the integration of this variable in the calculation of the well-being index. The impact of population density on well-being was not consistent across London wards, but having a higher population density generally affected wards' well-being scores negatively, but this association would benefit further analysis. The findings of this study have potential to enhance the index used to measure well-being across London.
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+```{echo=FALSE} 
+library(tidyverse)
+library(tmap)
+library(geojsonio)
+library(plotly)
+library(rgdal)
+library(mapview)
+library(sf)
+library(sp)
+library(car)
+library(fs)
+library(janitor)
+library(dplyr)
+library(data.table)
+library(spdep)
+library(spatstat)
+library(here)
+library(sp)
+library(rgeos)
+library(maptools)
+library(GISTools)
+library(geojson)
+library(tmaptools)
+library(ggplot2)
+library(spatialreg)
+library(broom)
+library(br)
+library(spgwr)
+library(sjPlot)
+library(sjmisc)
+library(sjlabelled)
+library(ggpubr)
 
-```{r cars}
-summary(cars)
 ```
 
 ## Including Plots
@@ -24,7 +54,12 @@ summary(cars)
 You can also embed plots, for example:
 
 ```{r pressure, echo=FALSE}
-plot(pressure)
+
 ```
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+```{r}
+
+```
+

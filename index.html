@@ -11,9 +11,9 @@
 
 <meta name="author" content="Margaux" />
 
-<meta name="date" content="2020-02-12" />
+<meta name="date" content="2021-10-01" />
 
-<title>Untitled</title>
+<title>A spatial analysis of well-being in London, UK</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -300,30 +300,52 @@ $(document).ready(function () {
 
 
 
-<h1 class="title toc-ignore">Untitled</h1>
+<h1 class="title toc-ignore">A spatial analysis of well-being in London, UK</h1>
 <h4 class="author">Margaux</h4>
-<h4 class="date">02/12/2020</h4>
+<h4 class="date">10/01/2021</h4>
 
 </div>
 
 
-<div id="r-markdown" class="section level2">
-<h2>R Markdown</h2>
-<p>This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <a href="http://rmarkdown.rstudio.com" class="uri">http://rmarkdown.rstudio.com</a>.</p>
-<p>When you click the <strong>Knit</strong> button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:</p>
-<pre class="r"><code>summary(cars)</code></pre>
-<pre><code>##      speed           dist       
-##  Min.   : 4.0   Min.   :  2.00  
-##  1st Qu.:12.0   1st Qu.: 26.00  
-##  Median :15.0   Median : 36.00  
-##  Mean   :15.4   Mean   : 42.98  
-##  3rd Qu.:19.0   3rd Qu.: 56.00  
-##  Max.   :25.0   Max.   :120.00</code></pre>
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>London is one of the least happy regions of the UK, despite having the highest per capita income, population density, and better health (Greater London Authority, 2012). This report addresses the need to consider an array of indicators to better represent and understand variation of well-being across urban space, to support targeted policy measures and enhance citizens’ lives. This study was designed to examine the relationships between well-being scores in London wards and their median household income and population density, and examine these variables’ potential to enhance the well-being measuring index. Linear regression models revealed positive and statistically significant associations between higher household income, lower population density and well-being scores. As Moran’s I, revealed statistically significant clustering of the residuals of this model, a Geographically Weighted Regression (GWR) model was calculated, to adjust for underlying spatial processes within the data and investigate the geographic variation in the association between household income, population density and wellbeing. The GWR revealed that an increase in a household income was associated with a statistically significant increase of the well-being score. This therefore provides some support for the integration of this variable in the calculation of the well-being index. The impact of population density on well-being was not consistent across London wards, but having a higher population density generally affected wards’ well-being scores negatively, but this association would benefit further analysis. The findings of this study have potential to enhance the index used to measure well-being across London.</p>
+<pre echo="FALSE"><code>library(tidyverse)
+library(tmap)
+library(geojsonio)
+library(plotly)
+library(rgdal)
+library(mapview)
+library(sf)
+library(sp)
+library(car)
+library(fs)
+library(janitor)
+library(dplyr)
+library(data.table)
+library(spdep)
+library(spatstat)
+library(here)
+library(sp)
+library(rgeos)
+library(maptools)
+library(GISTools)
+library(geojson)
+library(tmaptools)
+library(ggplot2)
+library(spatialreg)
+library(broom)
+library(br)
+library(spgwr)
+library(sjPlot)
+library(sjmisc)
+library(sjlabelled)
+library(ggpubr)
+</code></pre>
 </div>
 <div id="including-plots" class="section level2">
 <h2>Including Plots</h2>
 <p>You can also embed plots, for example:</p>
-<p><img src="index_files/figure-html/pressure-1.png" width="672" /></p>
 <p>Note that the <code>echo = FALSE</code> parameter was added to the code chunk to prevent printing of the R code that generated the plot.</p>
 </div>
 
