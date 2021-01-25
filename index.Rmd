@@ -260,12 +260,19 @@ ggplot(LonWard_WB_score_IV, aes(x=(inc_hh_median)^(1/3))) +
 Regressiondata <- LonWard_WB_score_IV%>%
   dplyr::select(WB_score_2013,  inc_hh_median, Population_per_square_kilometre )
 
+
+model1 <- lm(WB_score_2013 ~ inc_hh_median + 
+               Population_per_square_kilometre, data = Regressiondata)
+
 model2 <- lm(WB_score_2013 ~ I(inc_hh_median^(1/3)) + 
                I(Population_per_square_kilometre^(1/3)), data = Regressiondata)
 
 #show the summary of those outputs
+tab_model(model1, file = "LMtable.html" , pred.labels = c("(Intercept)", "Median Household Income", "Population density"  ))
+
+tab_model(model2, file = "LMtableTrans.html" , pred.labels = c("(Intercept)", "Median Household Income, Power 1/3", "Population density, Power 1/3"  ))
+
 glance(model2)
-tab_model(model2)
 
 ```
 In terms of the assumptions underpinning the linear regression, the residuals in the model had a normal distribution. There was no multicollinearity in the independent variables, there was some heteroscedasticity, but the clouds of residuals were still quite random (Field, 2012). However, Moran’s I statistic of 0.50 and p-value 3.21e-80 with a knn=4 showed there was indeed significant spatial autocorrelation among the residuals. Despite passing most of the assumptions of linear regressions, this spatial autocorrelation could be leading to biased estimates. The linear model under-predicts well-being scores of areas in blue on Figure 4, like in east London notably in Stratford, and over-predicts in the west and south, specifically in Ealing, Sutton, Bromley, shown in orange.
@@ -414,20 +421,13 @@ LonWard_WB_score_IV2 <- LonWard_WB_score_IV2 %>%
 # map  report  GWR coeff hh income Sig
 tmap_mode("view")
 tm_shape(LonWard_WB_score_IV2) +
-  tm_polygons( "GWRhhincSig", palette="-RdYlBu",  popup.vars=c("NAME", "WB_score_2013", "GWRhhincSig"),
-              title="GWR Coefficient Household Income")+
-  tm_layout(legend.outside = T )
+  tm_polygons ("GWRhhincSig", palette="-RdYlBu", popup.vars=c("NAME", "WB_score_2013", "GWRhhincSig"),  title="GWR significant Coefficient Household Income") +
+  tm_layout (legend.outside = TRUE)
+
 
 summary(LonWard_WB_score_IV2$GWRhhincSig)
 
 # same with pop density
-tmap_mode("view")
-tm_shape(LonWard_WB_score_IV2) +
-  tm_polygons("coefpopdensity",
-              palette = "-RdBu",  popup.vars=c("NAME", "WB_score_2013", "GWRhhincSig"),
-              title="GWR Coefficient Population Density")+
-  tm_layout(legend.outside = T )
-
 # Sig test pop density from Bristol ac uk 
 t2 = gwr.model$SDF$"I.Population_per_square_kilometre..1.3.." / gwr.model$SDF$"I.Population_per_square_kilometre..1.3.._se"
 
@@ -439,8 +439,8 @@ LonWard_WB_score_IV2 <- LonWard_WB_score_IV2 %>%
 tmap_mode("view")
 tm_shape(LonWard_WB_score_IV2) +
   tm_polygons(col = "GWRpopdensSigt2",
-              palette = "-RdYlBu",  title="GWR Coefficient")+
-  tm_layout(main.title = "GWR significant Coefficient Population Density", main.title.size = 1, legend.outside = T, legend.outside.position =  "right"  )
+              palette = "-RdYlBu",  popup.vars=c("NAME", "WB_score_2013", "GWRpopdensSigt2"), title="GWR significant Coefficient Population Density")+
+  tm_layout( legend.outside = T)
 
 summary(LonWard_WB_score_IV2$GWRpopdensSigt2)
 
