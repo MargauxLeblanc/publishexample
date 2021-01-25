@@ -30,12 +30,39 @@ hunk like this:
 ### Third sub title
 
 ```{r cars}
-library(sf)
-library(tmap)
-library(leafpop)
-library(leaflet)
-library(tmaptools)
 library(tidyverse)
+library(tmap)
+library(geojsonio)
+library(plotly)
+library(rgdal)
+library(mapview)
+library(sf)
+library(sp)
+library(car)
+library(fs)
+library(janitor)
+library(dplyr)
+library(data.table)
+library(spdep)
+library(spatstat)
+library(here)
+library(sp)
+library(rgeos)
+library(maptools)
+library(GISTools)
+library(geojson)
+library(tmaptools)
+library(ggplot2)
+library(spatialreg)
+library(broom)
+library(br)
+library(spgwr)
+library(sjPlot)
+library(sjmisc)
+library(sjlabelled)
+library(ggpubr)
+
+
 
 OSM <- st_read("C:/Users/Utilisateur/Documents/UCL_MSc_SGDS/T1_CASA0005_GISScience/week5/prac/prac5_r_proj/greater-london-latest-free.shp/gis_osm_pois_a_free_1.shp") %>%
   st_transform(., 27700) %>%
