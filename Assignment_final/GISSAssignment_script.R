@@ -138,7 +138,6 @@ C_LWard_Global_WB
 # Geary C statistic       Expectation          Variance 
 #   0.4088523229         1.0000000000         0.0006712584 
 
-
 #Local Moran's I 
 #use the local moran function to generate I for each ward in the city
 I_LWard_Local_WB <- LonWard_WB_score %>%
@@ -159,7 +158,6 @@ LonWard_WB_score <- LonWard_WB_score %>%
 # plot a map of the local Moran’s I outputs
 summary(LonWard_WB_score$density_I)
 summary(LonWard_WB_score$density_Iz)
-
 
 ggplot(LonWard_WB_score, aes(x=density_I)) +
   geom_histogram(binwidth=.5, colour='black', fill='white')
@@ -187,7 +185,6 @@ tm_shape(LonWard_WB_score) +
   tm_scale_bar(position=c(0.02,0.01), text.size=0.5)+
   tm_compass(north=0, position=c(0.02,0.10), text.size = 0.6)+
   tm_layout(main.title = "Local Moran's I, Well-Being Score in London", main.title.size = 1, legend.outside =  T,legend.outside.position =  "right")
-
 
 # Getis Ord G∗i statisic for hot and cold spots:
 Gi_LWard_Local_WB <- LonWard_WB_score %>%
@@ -254,7 +251,6 @@ rm(popdens_year)
 
 ## Inspect independent variables 
 # summary income 
-head(income_select)
 summary(income_select$inc_hh_median)
 
 # boxplot income
@@ -284,8 +280,7 @@ LonWard_WB_score_IV <- dplyr::left_join(LonWard_WB_score,income_select,by=c("GSS
 LonWard_WB_score_IV <- dplyr::left_join(LonWard_WB_score_IV,popdens13_select,by=c("GSS_CODE")) %>%
   drop_na()
 
-
-### transform income / 1000 =   household income in thousands ? 
+### transform income / 1000 =   household income in thousands £ 
 LonWard_WB_score_IV$inc_hh_median  <- (LonWard_WB_score_IV$inc_hh_median / 1000)
 
 ### transform pop density / 1000 = 1000 ppl per km? 
@@ -314,10 +309,7 @@ ggplot(LonWard_WB_score_IV,aes(x=inc_hh_median,y=WB_score_2013))+
   theme_bw()+
   stat_cor(method="pearson",size=3)
 
-
-
 #linear regression  WB & population density 
-
 q2 <- qplot(x = `Population_per_square_kilometre`, 
             y = `WB_score_2013`, 
             data=LonWard_WB_score_IV)
@@ -361,10 +353,6 @@ ggplot(LonWard_WB_score_IV, aes(x=Population_per_square_kilometre)) +
 ggplot(LonWard_WB_score_IV, aes(inc_hh_median)) + 
   geom_histogram()
 
-#  log of the household income median 
-ggplot(LonWard_WB_score_IV, aes(x=log(inc_hh_median))) + 
-  geom_histogram()
-
 # root transfor
 ggplot(LonWard_WB_score_IV, aes(x=(inc_hh_median)^(1/3))) + 
   geom_histogram() 
@@ -399,11 +387,6 @@ qplot(x = (Population_per_square_kilometre)^(1/3),
 
 Regressiondata <- LonWard_WB_score_IV%>%
   dplyr::select(WB_score_2013,  inc_hh_median, Population_per_square_kilometre )
-
-# OG model 
-#model2 <- lm(WB_score_2013 ~ I(inc_hh_median^(-1)) + 
-#             I(Population_per_square_kilometre^(0.5)), data = Regressiondata)
-
 
 model2 <- lm(WB_score_2013 ~ I(inc_hh_median^(1/3)) + 
                I(Population_per_square_kilometre^(1/3)), data = Regressiondata)
@@ -471,7 +454,6 @@ tm_shape(LonWard_WB_score_IV) +
   tm_layout(main.title = "Linear Model residuals", main.title.size = 1, legend.outside =  T,legend.outside.position =  "right" )
 
 # residuals' moran's I
-
 # centroids for 624 wards 
 coordsW <- LonWard_WB_score_IV%>%
   st_centroid()%>%
@@ -494,7 +476,6 @@ plot(LWard_nb, st_geometry(coordsW), col="red")
 plot(LWard_knn, st_geometry(coordsW), col="blue")
 
 #create a spatial weights matrix object from these weights
-
 Lward.queens_weight <- LWard_nb %>%
   nb2listw(., style="C")
 
@@ -586,11 +567,11 @@ summary(sem_model2)
 # AIC 2837
 # R² = 0.852
 
+
 ### GWR
 # reminder (+ residuals' Moran above )
 tmap_mode("view")
 qtm(LonWard_WB_score_IV, fill = "model2resids")
-
 
 st_crs(LonWard_WB_score_IV) = 27700
 
@@ -613,22 +594,6 @@ GWRbandwidth <- gwr.sel(WB_score_2013 ~ I(inc_hh_median^(1/3)) +
 
 #run the gwr model
 gwr.model = gwr(WB_score_2013 ~  I(inc_hh_median^(1/3)) + 
-                  I(Population_per_square_kilometre^(1/3)), 
-                data = LonWard_WB_SP, 
-                coords=coordsWSP, 
-                adapt=GWRbandwidth, 
-                hatmatrix=TRUE, 
-                se.fit=TRUE)
-
-#### different transf
-#calculate kernel bandwidth
-GWRbandwidth <- gwr.sel(WB_score_2013 ~ log(inc_hh_median) + 
-                          I(Population_per_square_kilometre^(1/3)),
-                        data = LonWard_WB_SP, 
-                        coords=coordsWSP,
-                        adapt=T)
-#run the gwr model
-gwr.model = gwr(WB_score_2013 ~  log(inc_hh_median) + 
                   I(Population_per_square_kilometre^(1/3)), 
                 data = LonWard_WB_SP, 
                 coords=coordsWSP, 
