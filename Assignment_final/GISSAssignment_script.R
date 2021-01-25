@@ -32,7 +32,7 @@ library(ggpubr)
 
 
 # load spatial data 
-Londonwards <-  st_read( "data/statistical-gis-boundaries-london/ESRI/London_Ward_CityMerged.shp")
+Londonwards <-  st_read( "Assignment_final/data/statistical-gis-boundaries-london/ESRI/London_Ward_CityMerged.shp")
 
 qtm(Londonwards)
 
@@ -40,7 +40,7 @@ qtm(Londonwards)
 londonwards_BNG <- st_transform(Londonwards, 27700)
 
 # Load Well-being data
-WBscore1 <- read.csv("data/london-ward-well-being-probability-scores/well-being_dashboad_scores_allweight1.csv", sep=";")
+WBscore1 <- read.csv("Assignment_final/data/london-ward-well-being-probability-scores/well-being_dashboad_scores_allweight1.csv", sep=";")
 
 #merge boundaries and data
 LonWard_WB_score <- londonwards_BNG%>%
@@ -169,6 +169,8 @@ breaks1<-c(-1000,-2.58,-1.96,-1.65,1.65,1.96,2.58,1000)
 
 MoranColours<- rev(brewer.pal(8, "RdGy"))
 
+GIColours<- rev(brewer.pal(8, "RdBu"))
+
 # interactive map
 tmap_mode("view")
 tm_shape(LonWard_WB_score) +
@@ -206,9 +208,6 @@ tm_shape(LonWard_WB_score) +
 
 # Getis ord map report version
 tmap_mode("plot")
-
-GIColours<- rev(brewer.pal(8, "RdBu"))
-
 tm_shape(LonWard_WB_score) +
   tm_polygons("density_G",
               style="fixed",
@@ -222,9 +221,8 @@ tm_shape(LonWard_WB_score) +
 
 
 ### Load and clean Independent variable files
-
 ## household income
-income <- read.csv("data/IV_Income_household/income_nospace.csv", sep=";" )
+income <- read.csv("Assignment_final/data/IV_Income_household/income_nospace.csv", sep=";" )
 
 income <- clean_names(income)
 names(income)
@@ -239,7 +237,7 @@ income_select <- rename(income_select, inc_hh_mean = x2012_13)
 income_select <- rename(income_select, inc_hh_median = x2012_13_1)
 
 ## population density
-populationdens <- read.csv("data/housing-density-ward.csv" )
+populationdens <- read.csv("Assignment_final/data/housing-density-ward.csv" )
 
 #Filter out only the 2013 data
 popdens_year <- dplyr::filter(populationdens, Year == "2013")
@@ -335,20 +333,6 @@ ggplot(LonWard_WB_score_IV, aes(x=WB_score_2013)) +
                size=1, 
                adjust=1)
 
-ggplot(LonWard_WB_score_IV, aes(x=inc_hh_median)) +
-  geom_histogram(aes(y = ..density..),
-                 binwidth = 1000) + 
-  geom_density(colour="red",
-               size=1, 
-               adjust=1)
-
-ggplot(LonWard_WB_score_IV, aes(x=Population_per_square_kilometre)) +
-  geom_histogram(aes(y = ..density..),
-                 binwidth = 1000) + 
-  geom_density(colour="red",
-               size=1, 
-               adjust=1)
-
 ##  distrib  median household income
 ggplot(LonWard_WB_score_IV, aes(inc_hh_median)) + 
   geom_histogram()
@@ -388,6 +372,9 @@ qplot(x = (Population_per_square_kilometre)^(1/3),
 Regressiondata <- LonWard_WB_score_IV%>%
   dplyr::select(WB_score_2013,  inc_hh_median, Population_per_square_kilometre )
 
+model1 <- lm(WB_score_2013 ~ inc_hh_median + 
+               Population_per_square_kilometre, data = Regressiondata)
+
 model2 <- lm(WB_score_2013 ~ I(inc_hh_median^(1/3)) + 
                I(Population_per_square_kilometre^(1/3)), data = Regressiondata)
 
@@ -397,8 +384,10 @@ glance(model2)
 summary(model2)
 tab_model(model2)
 
+
+tab_model(model1, file = "LMtable.html" , pred.labels = c("(Intercept)", "Median Household Income", "Population density"  ))
+
 tab_model(model2, file = "LMtableTrans.html" , pred.labels = c("(Intercept)", "Median Household Income, Power 1/3", "Population density, Power 1/3"  ))
-#file = "test.html"
 
 #and for future use, write the residuals out
 model_data2 <- model2 %>%
@@ -417,19 +406,16 @@ model_data2%>%
 #  good   
 
 ### Assumption 3 - Multicolinearity
-
 vif(model2)
 # all good 
 
 ## 4 = Homoscedaticity 
-
 #print some model diagnostics. 
 par(mfrow=c(2,2))    #plot to 2 by 2 array
 plot(model2)
 
 
 ## 5 =indep of error 
-
 #run durbin-watson test
 DW <- durbinWatsonTest(model2)
 tidy(DW)
@@ -635,6 +621,13 @@ tm_shape(LonWard_WB_score_IV2) +
   tm_polygons(col = "GWRhhincSig",
               palette = "-RdYlBu", title="GWR Coefficient")+
   tm_layout(main.title = "GWR significant Coefficient Household Income", main.title.size = 1, legend.outside = T, legend.outside.position =  "right"  )
+
+tmap_mode("view")
+tm_shape(LonWard_WB_score_IV2) +
+  tm_polygons ("GWRhhincSig", palette="-RdYlBu", popup.vars=c("NAME", "WB_score_2013", "GWRhhincSig"),  title="GWR significant Coefficient Household Income") +
+  tm_layout (legend.outside = TRUE)
+
+
 
 summary(LonWard_WB_score_IV2$GWRhhincSig)
 
