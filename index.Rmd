@@ -130,9 +130,9 @@ LonWard_WB_score <- rename(LonWard_WB_score, WB_score_2013 = X2013)
 # plot score WB (equal weights) in wards
 # interactive 
 tmap_mode("view")
-tm_shape(LonWard_WB_score) +
+tmap_leaflet(tm_shape(LonWard_WB_score) +
   tm_polygons( "WB_score_2013", style="jenks", popup.vars=c("NAME", "WB_score_2013"),  title="Well-being Score (weight= 1)") +
-  tm_layout (legend.outside = TRUE)
+  tm_layout (legend.outside = TRUE))
 
 
 ```
