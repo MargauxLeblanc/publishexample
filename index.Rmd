@@ -183,7 +183,6 @@ GetisOrdmap <- tm_shape(LonWard_WB_score) +
   tm_layout (legend.outside = TRUE)
 GetisOrdmap
 
-
 ```
 
 ###	Integrating new variables
