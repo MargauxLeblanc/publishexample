@@ -12,15 +12,15 @@ The code: https://github.com/PetitSushi/publishexample/blob/main/Assignment_fina
 
 The raw and pre-processed data: https://github.com/PetitSushi/publishexample/tree/main/Assignment_final/data 
 
-Some of the .xlsx files had to be cleaned and transformed into .csv before the cleaning was continued in RStudio (as seen in the .R file above). Hence both raw and manually cleaned datasets are available in the data folder. 
+Some .xlsx files had to be cleaned and transformed into .csv before the cleaning was continued in RStudio (included in the .R file above). Both raw and manually cleaned datasets are available in the data folder. 
 
 Data sources:
 
-1. London ward well being score : https://data.london.gov.uk/dataset/london-ward-well-being-scores. I used the latest release, 2013. 
+1. London ward well being score: https://data.london.gov.uk/dataset/london-ward-well-being-scores. I used the latest release, 2013. 
 
-2.
+2. London geographic boundaries: https://data.london.gov.uk/dataset/super-output-area-population-lsoa-msoa-london Ward level
 
-3.
+3. Household income estimates: https://data.london.gov.uk/dataset/household-income-estimates-small-areas. Ward level data, for the year 2012/2013. 
 
-4.
+4. Population Density: https://data.london.gov.uk/dataset/land-area-and-population-density-ward-and-borough From the 2011 national census
 
