@@ -12,7 +12,7 @@ The code: https://github.com/PetitSushi/publishexample/blob/main/Assignment_fina
 
 The raw and pre-processed data: https://github.com/PetitSushi/publishexample/tree/main/Assignment_final/data 
 
-Some .xlsx files had to be cleaned and transformed into .csv before the cleaning was continued in RStudio (included in the .R file above). Both raw and manually cleaned datasets are available in the data folder. 
+I had to remove some headers, titles, "£" characters, empty rows and colums from the .xlsx files and transformed into .csv before the cleaning was continued in RStudio (included in the .R file above). Both raw and manually cleaned datasets are available in the data folder. 
 
 Data sources:
 
