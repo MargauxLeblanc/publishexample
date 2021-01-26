@@ -75,7 +75,7 @@ As with previous policy-oriented research of the environment and human life char
 As shown in the first map, there was some variation in the spatial distribution of the 2013 well-being scores across London wards. The southern and south-western outer-edges of London had relatively higher well-being scores, while wards in north-east London had relatively lower scores. The well-being scores in central London were not homogenous, with the east getting more negative scores, and the west, around Belgravia and Kensington, getting some of the highest scores.
 
 
-```{r echo=FALSE, warning=FALSE, message=FALSE, fig.align="center"} 
+```{r warning=FALSE, message=FALSE, fig.align="center"} 
 library(tidyverse)
 library(tmap)
 library(geojsonio)
@@ -129,7 +129,7 @@ LonWard_WB_score <- rename(LonWard_WB_score, WB_score_2013 = X2013)
 
 # plot score WB (equal weights) in wards
 # interactive 
-tmap_mode("view")
+tmap_mode("plot")
 wBdistribmap  <- tmap_leaflet(tm_shape(LonWard_WB_score) +
   tm_polygons( "WB_score_2013", style="jenks", popup.vars=c("NAME", "WB_score_2013"),  title="Well-being Score (weight= 1)") +
   tm_layout (legend.outside = TRUE))
@@ -139,7 +139,7 @@ wBdistribmap
 
 A Global Moran’s I test calculated a statistic of 0.59 with a p-value < 2.2e-16, showing that similar well-being score values were distinctively clustered together. The G*i statistic, was calculated and mapped to identify statistical clustering of high values or low values and highlight hot and cold spots of well-being. Areas in red in the map below, on the south-western edge of London are pockets of high well-being scores, while the areas in blue in the North-East are clusters of neighbouring wards with low well-being scores.
 
-```{r echo=FALSE, warning=FALSE, message=FALSE, fig.align="center"}
+```{r warning=FALSE, message=FALSE, fig.align="center"}
 
 ### Let's look at distribution of WB in London 
 
@@ -255,19 +255,27 @@ Indeed, as shown in the Table below, an increase of £1000 in a ward’s median 
 
 ##  distrib  median household income
 ggplot(LonWard_WB_score_IV, aes(inc_hh_median)) + 
-  geom_histogram()
+  geom_histogram()+
+   labs( x= "Household Median Income, (Thousands of £)", y= "Ward Count") +
+  theme_bw()
+
+# raising household income variable to cube root power makes its distribution more normal:
+ggplot(LonWard_WB_score_IV, aes(x=(inc_hh_median)^(1/3))) + 
+  geom_histogram()+
+   labs( x= "Household Median Income, with cube root power transformation", y= "Ward Count") +
+  theme_bw()
 
 ##  distrib  pop density 
 ggplot(LonWard_WB_score_IV, aes(Population_per_square_kilometre)) + 
-  geom_histogram()
+  geom_histogram()+
+  labs( x= "Population Density (Thousands of people per Km²)", y= "Ward Count") +
+  theme_bw()
 
 # raising our pop density  variable to cube root power leads to a more normal distribution:
 ggplot(LonWard_WB_score_IV, aes(x=(Population_per_square_kilometre)^(1/3))) + 
-  geom_histogram()
-
-# root transform
-ggplot(LonWard_WB_score_IV, aes(x=(inc_hh_median)^(1/3))) + 
-  geom_histogram() 
+  geom_histogram()+
+    labs( x= "Population Density, with cube root power transformation)", y= "Ward Count") +
+  theme_bw()
 
 Regressiondata <- LonWard_WB_score_IV%>%
   dplyr::select(WB_score_2013,  inc_hh_median, Population_per_square_kilometre )
@@ -303,8 +311,10 @@ model_data2%>%
   dplyr::select(.resid)%>%
   pull()%>%
   qplot()+ 
-  geom_histogram() 
-#  good   
+  geom_histogram()+
+  labs( x= "Linear Regression Residuals", y= "Ward Count") +
+  theme_bw()
+#  normal distribution    
 
 ### Assumption 3 - Multicolinearity
 vif(model2)
@@ -448,7 +458,7 @@ LonWard_WB_score_IV2 <- LonWard_WB_score_IV2 %>%
   mutate(GWRpopdensSigt2 = t2)
 
 #plot
-tmap_mode("view")
+# tmap_mode("view")
 GWRcoefPopmap <- tm_shape(LonWard_WB_score_IV2) +
   tm_polygons(col = "GWRpopdensSigt2",
               palette = "-RdYlBu",  popup.vars=c("NAME", "WB_score_2013", "GWRpopdensSigt2"), title="GWR significant Coefficient Population Density")+
