@@ -6,13 +6,13 @@ This project explores the spatial distribution and measurement of well-being in 
 It examines the relationships between London wards' well-being scores (as measured by Greater London Authority), and their median household income and population density.
 The analysis utilises linear and Geographically Weighted Regressions to assess these variables’ potential in enhancing the GLA well-being index.
 
-The affiliated webpage: https://petitsushi.github.io/publishexample/
+The affiliated webpage: https://petitsushi.github.io/publishexample/ showing the analysis outputs within the narrative of the report 
 
-The code: https://github.com/PetitSushi/publishexample/blob/main/Assignment_final/GISSAssignment_script.R
+The code: https://github.com/PetitSushi/publishexample/blob/main/Assignment_final/GISSAssignment_script.R with all the steps taken to get the output and some comments
 
 The raw and pre-processed data: https://github.com/PetitSushi/publishexample/tree/main/Assignment_final/data 
 
-I had to remove some headers, titles, "£" characters, empty rows and colums from the .xlsx files and transformed into .csv before the cleaning was continued in RStudio (included in the .R file above). Both raw and manually cleaned datasets are available in the data folder. 
+I had to remove some headers, titles, "£" characters, empty rows and colums from the .xlsx files, transformed into .csv before I moved onto RStudio to continue the cleaning ( it's included in the .R file above). Both raw and manually cleaned datasets are available in the data folder. 
 
 Data sources:
 
