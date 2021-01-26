@@ -9,4 +9,18 @@ The analysis utilises linear and Geographically Weighted Regressions to assess t
 The affiliated webpage: https://petitsushi.github.io/publishexample/
 
 The code: https://github.com/PetitSushi/publishexample/blob/main/Assignment_final/GISSAssignment_script.R
+
 The raw and pre-processed data: https://github.com/PetitSushi/publishexample/tree/main/Assignment_final/data 
+
+Some of the .xlsx files had to be cleaned and transformed into .csv before the cleaning was continued in RStudio (as seen in the .R file above). Hence both raw and manually cleaned datasets are available in the data folder. 
+
+Data sources:
+
+1. London ward well being score : https://data.london.gov.uk/dataset/london-ward-well-being-scores. I used the latest release, 2013. 
+
+2.
+
+3.
+
+4.
+
