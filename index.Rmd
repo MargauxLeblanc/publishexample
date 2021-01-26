@@ -129,7 +129,7 @@ LonWard_WB_score <- rename(LonWard_WB_score, WB_score_2013 = X2013)
 
 # plot score WB (equal weights) in wards
 # interactive 
-tmap_mode("plot")
+#tmap_mode("plot")
 wBdistribmap  <- tmap_leaflet(tm_shape(LonWard_WB_score) +
   tm_polygons( "WB_score_2013", style="jenks", popup.vars=c("NAME", "WB_score_2013"),  title="Well-being Score (weight= 1)") +
   tm_layout (legend.outside = TRUE))
@@ -189,14 +189,14 @@ GetisOrdmap
 
 The linear regressions (in the graphs below) revealed positive and statistically significant associations between the value of median household income, the population density and the well-being scores.
 
-```{r echo=FALSE,  warning=FALSE, message=FALSE, fig.align="center"} 
+```{r warning=FALSE, message=FALSE, fig.align="center"} 
 
 ### Load and clean Independent variable files
 ## household income
 income <- read.csv("Assignment_final/data/IV_Income_household/income_nospace.csv", sep=";" )
 
 income <- clean_names(income)
-names(income)
+
 #  remove useless columns 
 income_select <- dplyr::select(income, -c("ward_name",  "lad_code" ,  "borough"  ,  "x2001_02" ,  "x2002_03"  , "x2003_04"  ,
                                           "x2004_05" ,  "x2005_06",   "x2006_07" ,  "x2007_08"  , "x2008_09" ,  "x2009_10" ,  "x2010_11"  , "x2011_12" , "x2001_02_1", "x" ,  "x2002_03_1" ,"x2003_04_1" ,"x2004_05_1" ,"x2005_06_1",
@@ -251,7 +251,7 @@ ggplot(LonWard_WB_score_IV,aes(x=Population_per_square_kilometre,y=WB_score_2013
 
 ```
 Indeed, as shown in the Table below, an increase of £1000 in a ward’s median household income would increase its well-being score by 0.59, while having 1000 more people per Km² would decrease that score by 0.30. The models R² value indicate these variables explain around 70% of variation in well-being scores. In the first table the variables have not been transformed despite their distribution being slightly skewed; the second table shows the result of the same model once transformed with cube root power.
-```{r echo=FALSE,  warning=FALSE, message=FALSE, fig.align="center"} 
+```{r  warning=FALSE, message=FALSE, fig.align="center"} 
 
 ##  distrib  median household income
 ggplot(LonWard_WB_score_IV, aes(inc_hh_median)) + 
@@ -292,11 +292,9 @@ tab_model(model1, file = "LMtable.html" , pred.labels = c("(Intercept)", "Median
 
 tab_model(model2, file = "LMtableTrans.html" , pred.labels = c("(Intercept)", "Median Household Income, Power 1/3", "Population density, Power 1/3"  ))
 
-glance(model2)
-
 ```
 In terms of the assumptions underpinning the linear regression, the residuals in the model had a normal distribution. There was no multicollinearity in the independent variables, there was some heteroscedasticity, but the clouds of residuals were still quite random (Field, 2012). However, Moran’s I statistic of 0.50 and p-value 3.21e-80 with a knn=4 showed there was indeed significant spatial autocorrelation among the residuals. Despite passing most of the assumptions of linear regressions, this spatial autocorrelation could be leading to biased estimates. The linear model under-predicts well-being scores of areas in blue, like in east London notably in Stratford, and over-predicts in the west and south, specifically in Ealing, Sutton, Bromley, shown in orange.
-```{r echo=FALSE,  warning=FALSE, message=FALSE, fig.align="center"} 
+```{r warning=FALSE, message=FALSE, fig.align="center"} 
 
 #and for future use, write the residuals out
 model_data2 <- model2 %>%
@@ -324,7 +322,6 @@ vif(model2)
 #print some model diagnostics. 
 par(mfrow=c(2,2))    #plot to 2 by 2 array
 plot(model2)
-
 
 ## 5 =indep of error 
 #run durbin-watson test
@@ -387,7 +384,7 @@ Nearest_neighbour
 
 The GWR coefficients in Table 3 indicate the expected change in well-being score for a £1000 increase in household income, and an increase of 1000 people per Km². The cube root power transformations make the coefficients’ interpretation more difficult, and inference on the values are to be considered carefully. Nonetheless, for half the wards in the dataset, when household income increases, well-being score would reach between 18 and 28. While for 50% of the wards, an increase in population density would lead to a drop by 3 or an increase by 1 well-being units.
 
-```{r echo=FALSE,  warning=FALSE, message=FALSE, fig.align="center"} 
+```{r  warning=FALSE, message=FALSE, fig.align="center"} 
 ### GWR
 st_crs(LonWard_WB_score_IV) = 27700
 
@@ -423,7 +420,7 @@ gwr.model
 
 ```
 To visually investigate the spatial variation in these associations, the coefficients for each variable were mapped, to reveal strength variation in terms of well-being outcome scores. Taking map (a), we can see that for the majority of wards in London, there is the positive relationship we would expect, as median household income goes up, well-being score increases. Results for population density coefficients are more ambivalent in map (b), an increased population density would mildly impact most wards’ well-being scores either positively or negatively, however, decreases are more frequent and have a more significant magnitude, like in north London, in East Finchley for example. 
-``` {r echo=FALSE,  warning=FALSE, message=FALSE, fig.align="center"} 
+``` {r   warning=FALSE, message=FALSE, fig.align="center"} 
 
 results <- as.data.frame(gwr.model$SDF)
 
