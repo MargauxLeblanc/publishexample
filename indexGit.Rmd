@@ -1,0 +1,551 @@
+---
+title: "A spatial analysis of well-being in London, UK"
+author: "Margaux Leblanc"
+date: "10/01/2021"
+output: github_document
+always_allow_html: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+This piece is part of an assignment for CASA0005 "Geographic Information Systems
+and Science".
+
+## Introduction
+
+London is one of the least happy regions of the UK, despite having the highest per capita income, population density, and better health (Greater London Authority, 2012). This report addresses the need to consider an array of indicators to better represent and understand variation of well-being across urban space, to support targeted policy measures and enhance citizens’ lives. 
+This study was designed to examine the relationships between well-being scores in London wards and their median household income and population density, and examine these variables' potential to enhance the well-being measuring index. Linear regression models revealed positive and statistically significant associations between higher household income, lower population density and well-being scores. As Moran's I, revealed statistically significant clustering of the residuals of this model, a Geographically Weighted Regression (GWR) model was calculated, to adjust for underlying spatial processes within the data and investigate the geographic variation in the association between household income, population density and wellbeing. The GWR revealed that an increase in a household income was associated with a statistically significant increase of the well-being score. This therefore provides some support for the integration of this variable in the calculation of the well-being index. The impact of population density on well-being was not consistent across London wards, but having a higher population density generally affected wards' well-being scores negatively, but this association would benefit further analysis. The findings of this study have potential to enhance the index used to measure well-being across London.
+
+
+## Literature Review
+
+###	Defining well-being
+
+Despite being under the spotlight within policy work, and a growing area of research, there is no consensus on a definition of well-being. Most philosophers and authors would characterize well-being as a general good feeling, and satisfaction in multiple domains of life, including housing, income, jobs, community, education, environment, governance, emotional and physical health, life satisfaction, safety, and work-life balance (Adler and Seligman, 2016). Dodge et al (2012) argue that well-being is an equilibrium, or the fluctuating state between challenges and resources in their physical, social, and psychological forms.
+
+###	Measuring well-being
+
+Correspondingly, there are many ways of measuring well-being, and a multitude of possible indicators to consider. Overall, research has shown that well-being correlates well with objective measures such as income and employment status, but these alone cannot tell the whole story (Greater London Authority, 2012). Therefore, measures of urban well-being typically combine a multitude of objective, subjective and built environment indicators which are selected to answer a specific purpose. The Healthy Cities Index contains 10 environment categories and 58 indicators and aims to shed light onto the links between the environment and health, as well as identify responsibility, so as to eventually promote well-being (Pineo, et al., 2018). For example, the City Well-Being Index rates the quality of life and liveability of the world’s major cities for the use of individuals (Harley and Knight, 2020). 
+
+###	Relevance in policy
+
+As researchers establish links between people’s socio-spatial environments and their well-being, they call for a wider use of their findings in planning, policy, and decision-making (Rajendran et al., 2020). Indeed, city planners can utilise a measure of well-being as a baseline for tracking changes over time, for understanding what needs addressing in specific demographic groups, to determine how to allocate resources, to forecast future behaviour, and generally to elevate the human condition (Veneri and Edzes, 2017, Adler and Seligman, 2016; OECD, 2013; Greater London Authority, 2012).
+
+### Well-being in London
+
+The Office for National Statistics launched a specific program focusing on measuring national well-being in 2010, in order to comprehensively assess how development is affecting the population, and how sustainable it is for the future (ONS, 2019). Also, it is important for London policy makers to consider well-being at a small-scale level because of the often huge differences within boroughs. Greater London Authority (2012) created a tool which presents a combined measure of 12 of the most relevant ‘objective’ and ‘subjective’ indicators representing different areas of life, listed below, to calculate a single well-being score at ward level (London DataStore, 2013).
+
+Themes: 	Indicators
+
+Health: 	Life expectancy; 	Childhood Obesity; 	Incapacity benefits claimant rate
+Economic security: 	Unemployment rate
+Safety:	Crime rate; Deliberate fires
+Education:	GCSE point scores
+Children:	Unauthorised pupil absence
+Families:	Children in out-of-work families
+Transport:	Public Transport Accessibility Scores (PTALs)
+Environment:	Access to open space & nature
+Happiness:	Composite Subjective Well-being Score (Life Satisfaction, Worthwhileness, Anxiety, and Happiness)
+
+
+Household income is an objective measure which correlates highly with well-being (Greater London Authority, 2012). However, household income was not directly included in the index, whereas authors and GLA suggest it could explain some of the well-being variation (Ballas, 2013; Stanca, 2010). The role of population density seems to have an ambivalent impact on well-being. They are generally well connected, and provide good access to services, but their residents are more likely to feel unsafe, have fewer social interactions and a lower access to quality green space (Dempsey et al, 2012). Rajendran et al (2020) examined the impact of population density and deprivation on the well-being of selected wards in Birmingham, UK, and found that in relatively less dense and deprived areas people felt better, which indicates population density is a meaningful indicator, but it may not give the full picture on its own. Li and Kanazawa (2016) found population density at the census block to decrease self-reported life satisfaction. There is no consensus on an ideal level of population density, or the set of conditions that need to be satisfied for improved well-being, but further analysis of this phenomenon may enlighten this relationship. It seems both household income and population density could have a significant association with well-being, and bear potential for a more accurate measure of it. 
+
+This report aims to: (1) examine spatial distribution of well-being across London and spot any clusters of high or low scores; (2) investigate inequalities in terms of how inhabitants of different wards are likely to experience well-being; (3) analyse how indicators that were not included in the GLA well-being index can enhance its calculation. 
+
+
+##	Methodology
+
+###	Data
+
+The well-being and household income files downloaded from London Data Store were .xls and .xlsx spreadsheets. Some metadata, explanations, titles, empty rows and columns were manually removed before the files were saved as .csv. Raw and cleaned datasets and Readme files can be found on the linked GitHub repository. It was possible to add weighting to each of the 12 indicators of the well-being index, depending on what one considers to be the more or less important and generate bespoke scores, but for the sake of this analysis all weightings were set equal. The rest of the data cleaning and all of the analysis and map making were done in RStudio to foster scientific reproducibility. For this analysis, the most recent well-being scores data available, dating from 2013, was used. Median Household Income was chosen over Mean Household Income as it seemed better for population representativity purposes; it is a yearly measure for the 2012/2013 period.
+
+###	Analysis
+
+For the analysis of spatial autocorrelation, queen-based contiguity weights were adopted for Global Moran's I as well as subsequent spatial analyses because the sample size seemed big enough (n=625). Breaks for Gi* Statistics were set based on confidence levels related to data points’ distance from the mean.
+
+Then, a linear model was used to assess the relationships between the independent variables, the household median income and the population density and the well-being scores. It predicts the well-being score of wards and includes median household income and population density in the calculation. As part of the Ordinary Least Square (OLS) model, the residuals indicate the distance between the values predicted by this model and the original well-being scores. The residual errors were also investigated with Moran’s I, revealing significant spatial clustering, and highlighting how the model systematically over- and under-estimates the associations, implying geographic variation across the study space. 
+
+As with previous policy-oriented research of the environment and human life characteristics, a Geographically Weighted Regression (GWR) model was selected as an appropriate method to analyse local variations (Houlden et al., 2019; Chen and Truong, 2012; Ogneva-Himmelberger et al, 2009). Its use in this study aims to adjust for these evident underlying spatial processes within the data and investigate the geographic variation in the association between household income, population density and well-being. The GWR method calculates a localised regression using distance-based weighting for each point, this method is essentially a regression model in which the coefficients are allowed to vary over space (Brunsdon et al., 1996). The GWR coefficients’ strengths and spatial variation imply that the importance of household income and population density may also differ across the city. The GWR is supported by a local weight matrix W,  calculated from a kernel function that places more weight on neighbouring locations and takes into account the degree of spatial dependence in a continuous spatial framework (Fotheringham et al., 2003). Since there is no consensus on how to assess confidence in the coefficients from a GWR model, this study adopted the ArcGIS Pro (n.d.) approach, dividing the coefficient by the standard error provided for each feature as a way of scaling the magnitude of the estimation.
+
+
+##	Results
+
+###	Spatial distribution of well-being
+
+As shown in the first map, there was some variation in the spatial distribution of the 2013 well-being scores across London wards. The southern and south-western outer-edges of London had relatively higher well-being scores, while wards in north-east London had relatively lower scores. The well-being scores in central London were not homogenous, with the east getting more negative scores, and the west, around Belgravia and Kensington, getting some of the highest scores.
+
+
+```{r warning=FALSE, message=FALSE, fig.align="center"} 
+library(tidyverse)
+library(tmap)
+library(geojsonio)
+library(plotly)
+library(rgdal)
+library(mapview)
+library(sf)
+library(sp)
+library(car)
+library(fs)
+library(janitor)
+library(dplyr)
+library(data.table)
+library(spdep)
+library(spatstat)
+library(here)
+library(sp)
+library(rgeos)
+library(maptools)
+library(GISTools)
+library(geojson)
+library(tmaptools)
+library(ggplot2)
+library(spatialreg)
+library(broom)
+library(spgwr)
+library(sjPlot)
+library(sjmisc)
+library(sjlabelled)
+library(ggpubr)
+
+
+# load spatial data 
+Londonwards <-  st_read( "Assignment_final/data/statistical-gis-boundaries-london/ESRI/London_Ward_CityMerged.shp")
+
+# set projection
+londonwards_BNG <- st_transform(Londonwards, 27700)
+
+# Load Well-being data
+WBscore1 <- read.csv("Assignment_final/data/london-ward-well-being-probability-scores/well-being_dashboad_scores_allweight1.csv", sep=";")
+
+#merge boundaries and data
+LonWard_WB_score <- londonwards_BNG%>%
+  left_join(.,
+            WBscore1, 
+            by = c("GSS_CODE" = "Ward.Code"))
+
+rm(WBscore1)
+
+LonWard_WB_score <- rename(LonWard_WB_score, WB_score_2013 = X2013)
+
+# plot score WB (equal weights) in wards
+# interactive 
+#tmap_mode("plot")
+wBdistribmap  <- tmap_leaflet(tm_shape(LonWard_WB_score) +
+  tm_polygons( "WB_score_2013", style="jenks", popup.vars=c("NAME", "WB_score_2013"),  title="Well-being Score (weight= 1)") +
+  tm_layout (legend.outside = TRUE))
+wBdistribmap
+
+```
+
+A Global Moran’s I test calculated a statistic of 0.59 with a p-value < 2.2e-16, showing that similar well-being score values were distinctively clustered together. The G*i statistic, was calculated and mapped to identify statistical clustering of high values or low values and highlight hot and cold spots of well-being. Areas in red in the map below, on the south-western edge of London are pockets of high well-being scores, while the areas in blue in the North-East are clusters of neighbouring wards with low well-being scores.
+
+```{r warning=FALSE, message=FALSE, fig.align="center"}
+
+### Let's look at distribution of WB in London 
+
+# calculate the centroids of all Wards in London
+coordsW <- LonWard_WB_score%>%
+  st_centroid()%>%
+  st_geometry()
+
+#create a neighbours list
+LWard_nb <- LonWard_WB_score %>% 
+  poly2nb(., queen=T)
+
+#creating a spatial weights object from these weights
+Lward.lw <- LWard_nb %>%
+  nb2listw(., style="C")
+
+# Moran's I 
+I_LWard_Global_WB <- LonWard_WB_score %>%
+  pull(WB_score_2013) %>%
+  as.vector()%>%
+  moran.test(., Lward.lw)
+
+I_LWard_Global_WB
+
+# Getis Ord G∗i statisic for hot and cold spots:
+Gi_LWard_Local_WB <- LonWard_WB_score %>%
+  pull(WB_score_2013) %>%
+  as.vector()%>%
+  localG(., Lward.lw)
+
+LonWard_WB_score <- LonWard_WB_score %>%
+  mutate(density_G = as.numeric(Gi_LWard_Local_WB))
+
+breaks1<-c(-1000,-2.58,-1.96,-1.65,1.65,1.96,2.58,1000)
+GIColours<- rev(brewer.pal(8, "RdBu"))
+
+# plot Getis Ord on an interactive map
+tmap_mode("plot")
+GetisOrdmap <- tm_shape(LonWard_WB_score) +
+  tm_polygons ("density_G", style="fixed", breaks=breaks1, palette=GIColours, popup.vars=c("NAME", "WB_score_2013", "density_G"),  title="Getis Ord Gi, Well-Being Score in London") +
+  tm_layout (legend.outside = TRUE)
+GetisOrdmap
+
+```
+
+###	Integrating new variables
+
+The linear regressions (in the graphs below) revealed positive and statistically significant associations between the value of median household income, the population density and the well-being scores.
+
+```{r warning=FALSE, message=FALSE, fig.align="center"} 
+
+### Load and clean Independent variable files
+## household income
+income <- read.csv("Assignment_final/data/IV_Income_household/income_nospace.csv", sep=";" )
+
+income <- clean_names(income)
+
+#  remove useless columns 
+income_select <- dplyr::select(income, -c("ward_name",  "lad_code" ,  "borough"  ,  "x2001_02" ,  "x2002_03"  , "x2003_04"  ,
+                                          "x2004_05" ,  "x2005_06",   "x2006_07" ,  "x2007_08"  , "x2008_09" ,  "x2009_10" ,  "x2010_11"  , "x2011_12" , "x2001_02_1", "x" ,  "x2002_03_1" ,"x2003_04_1" ,"x2004_05_1" ,"x2005_06_1",
+                                          "x2006_07_1" , "x2007_08_1" , "x2008_09_1" , "x2009_10_1" , "x2010_11_1" , "x2011_12_1"))
+
+rm(income)
+income_select <- rename(income_select, GSS_CODE = i_code)
+income_select <- rename(income_select, inc_hh_mean = x2012_13)
+income_select <- rename(income_select, inc_hh_median = x2012_13_1)
+
+## population density
+populationdens <- read.csv("Assignment_final/data/housing-density-ward.csv" )
+
+#Filter out only the 2013 data
+popdens_year <- dplyr::filter(populationdens, Year == "2013")
+rm(populationdens)
+
+popdens13_select <- dplyr::select(popdens_year, -c("Borough" , "Ward_Name" ,"Year"  ,"Hectares"  , "Square_Kilometres" , "Population_per_hectare" ))
+popdens13_select <- rename(popdens13_select, GSS_CODE = Code)
+rm(popdens_year)
+
+
+## join &  drop row one value missing from pop density  
+LonWard_WB_score_IV <- dplyr::left_join(LonWard_WB_score,income_select,by=c("GSS_CODE"))
+LonWard_WB_score_IV <- dplyr::left_join(LonWard_WB_score_IV,popdens13_select,by=c("GSS_CODE")) %>%
+  drop_na()
+
+### transform income / 1000 =   household income in thousands £ 
+LonWard_WB_score_IV$inc_hh_median  <- (LonWard_WB_score_IV$inc_hh_median / 1000)
+
+### transform pop density / 1000 = 1000 ppl per km
+LonWard_WB_score_IV$Population_per_square_kilometre  <- (LonWard_WB_score_IV$Population_per_square_kilometre / 1000)
+
+
+##### LM assumptions check
+#  assumption 1 = There is a linear relationship between the dependent and independent variables
+#linear regression  WB & household income median 
+ggplot(LonWard_WB_score_IV,aes(x=inc_hh_median,y=WB_score_2013))+
+  geom_point()+
+  geom_smooth(method="lm")+
+   scale_x_continuous(breaks = seq(20,90,10),limits = c(20, 90))+
+  labs(x = "Median Household Income (£)", y = "Well-Being Score 2013")+
+  theme_bw()
+
+#linear regression  WB & population density
+ggplot(LonWard_WB_score_IV,aes(x=Population_per_square_kilometre,y=WB_score_2013))+
+  geom_point()+
+  geom_smooth(method="lm")+
+  labs(x = "Population per Km²", y = " Well-Being Score 2013")+
+  theme_bw()
+
+
+```
+Indeed, as shown in the Table below, an increase of £1000 in a ward’s median household income would increase its well-being score by 0.59, while having 1000 more people per Km² would decrease that score by 0.30. The models R² value indicate these variables explain around 70% of variation in well-being scores. In the first table the variables have not been transformed despite their distribution being slightly skewed; the second table shows the result of the same model once transformed with cube root power.
+```{r  warning=FALSE, message=FALSE, fig.align="center"} 
+
+##  distrib  median household income
+ggplot(LonWard_WB_score_IV, aes(inc_hh_median)) + 
+  geom_histogram()+
+   labs( x= "Household Median Income, (Thousands of £)", y= "Ward Count") +
+  theme_bw()
+
+# raising household income variable to cube root power makes its distribution more normal:
+ggplot(LonWard_WB_score_IV, aes(x=(inc_hh_median)^(1/3))) + 
+  geom_histogram()+
+   labs( x= "Household Median Income, with cube root power transformation", y= "Ward Count") +
+  theme_bw()
+
+##  distrib  pop density 
+ggplot(LonWard_WB_score_IV, aes(Population_per_square_kilometre)) + 
+  geom_histogram()+
+  labs( x= "Population Density (Thousands of people per Km²)", y= "Ward Count") +
+  theme_bw()
+
+# raising our pop density  variable to cube root power leads to a more normal distribution:
+ggplot(LonWard_WB_score_IV, aes(x=(Population_per_square_kilometre)^(1/3))) + 
+  geom_histogram()+
+    labs( x= "Population Density, with cube root power transformation)", y= "Ward Count") +
+  theme_bw()
+
+Regressiondata <- LonWard_WB_score_IV%>%
+  dplyr::select(WB_score_2013,  inc_hh_median, Population_per_square_kilometre )
+
+
+model1 <- lm(WB_score_2013 ~ inc_hh_median + 
+               Population_per_square_kilometre, data = Regressiondata)
+
+model2 <- lm(WB_score_2013 ~ I(inc_hh_median^(1/3)) + 
+               I(Population_per_square_kilometre^(1/3)), data = Regressiondata)
+
+#show the summary of those outputs
+tab_model(model1, file = "LMtable.html" , pred.labels = c("(Intercept)", "Median Household Income", "Population density"  ))
+
+tab_model(model2, file = "LMtableTrans.html" , pred.labels = c("(Intercept)", "Median Household Income, Power 1/3", "Population density, Power 1/3"  ))
+
+```
+In terms of the assumptions underpinning the linear regression, the residuals in the model had a normal distribution. There was no multicollinearity in the independent variables, there was some heteroscedasticity, but the clouds of residuals were still quite random (Field, 2012). However, Moran’s I statistic of 0.50 and p-value 3.21e-80 with a knn=4 showed there was indeed significant spatial autocorrelation among the residuals. Despite passing most of the assumptions of linear regressions, this spatial autocorrelation could be leading to biased estimates. The linear model under-predicts well-being scores of areas in blue, like in east London notably in Stratford, and over-predicts in the west and south, specifically in Ealing, Sutton, Bromley, shown in orange.
+```{r warning=FALSE, message=FALSE, fig.align="center"} 
+
+#and for future use, write the residuals out
+model_data2 <- model2 %>%
+  augment(., Regressiondata)
+
+# also add the residuals to the shapelayer
+LonWard_WB_score_IV <- LonWard_WB_score_IV %>%
+  mutate(model2resids = residuals(model2))
+
+#plot residuals
+model_data2%>%
+  dplyr::select(.resid)%>%
+  pull()%>%
+  qplot()+ 
+  geom_histogram()+
+  labs( x= "Linear Regression Residuals", y= "Ward Count") +
+  theme_bw()
+#  normal distribution    
+
+### Assumption 3 - Multicolinearity
+vif(model2)
+# all good 
+
+## 4 = Homoscedaticity 
+#print some model diagnostics. 
+par(mfrow=c(2,2))    #plot to 2 by 2 array
+plot(model2)
+
+## 5 =indep of error 
+#run durbin-watson test
+DW <- durbinWatsonTest(model2)
+tidy(DW)
+
+#now plot the residuals (of lm model)
+# get interactive output 
+
+tmap_mode("plot")
+LMresidualsmap <- tm_shape(LonWard_WB_score_IV) +
+  tm_polygons ("model2resids", palette="-RdYlBu", popup.vars=c("NAME", "WB_score_2013", "model2resids"),  title="Linear Model Residuals") +
+  tm_layout (legend.outside = TRUE)
+LMresidualsmap
+
+# residuals' moran's I
+# centroids for 624 wards 
+coordsW <- LonWard_WB_score_IV%>%
+  st_centroid()%>%
+  st_geometry()
+
+# queen case weight matrix
+LWard_nb <- LonWard_WB_score_IV %>%
+  poly2nb(., queen=T)
+
+#or nearest neighbours
+knn_wards <-coordsW %>%
+  knearneigh(., k=4)
+
+LWard_knn <- knn_wards %>%
+  knn2nb()
+
+#create a spatial weights matrix object from these weights
+Lward.queens_weight <- LWard_nb %>%
+  nb2listw(., style="C")
+
+Lward.knn_4_weight <- LWard_knn %>%
+  nb2listw(., style="C")
+
+Queen <- LonWard_WB_score_IV %>%
+  st_drop_geometry()%>%
+  dplyr::select(model2resids)%>%
+  pull()%>%
+  moran.test(., Lward.queens_weight)%>%
+  tidy()
+
+Nearest_neighbour <- LonWard_WB_score_IV %>%
+  st_drop_geometry()%>%
+  dplyr::select(model2resids)%>%
+  pull()%>%
+  moran.test(., Lward.knn_4_weight)%>%
+  tidy()
+
+Queen
+Nearest_neighbour  
+#  Morans's I [0.47 ; 0.5] moderate spatial autocorrelation in the residuals
+
+
+```
+
+The GWR coefficients in Table 3 indicate the expected change in well-being score for a £1000 increase in household income, and an increase of 1000 people per Km². The cube root power transformations make the coefficients’ interpretation more difficult, and inference on the values are to be considered carefully. Nonetheless, for half the wards in the dataset, when household income increases, well-being score would reach between 18 and 28. While for 50% of the wards, an increase in population density would lead to a drop by 3 or an increase by 1 well-being units.
+
+```{r  warning=FALSE, message=FALSE, fig.align="center"} 
+### GWR
+st_crs(LonWard_WB_score_IV) = 27700
+
+LonWard_WB_SP <- LonWard_WB_score_IV %>%
+  as(., "Spatial")
+
+st_crs(coordsW) = 27700
+
+coordsWSP <- coordsW %>%
+  as(., "Spatial")  
+
+coordsWSP
+
+#calculate kernel bandwidth
+GWRbandwidth <- gwr.sel(WB_score_2013 ~ I(inc_hh_median^(1/3)) + 
+                          I(Population_per_square_kilometre^(1/3)),
+                        data = LonWard_WB_SP, 
+                        coords=coordsWSP,
+                        adapt=T)
+
+#run the gwr model
+gwr.model = gwr(WB_score_2013 ~  I(inc_hh_median^(1/3)) + 
+                  I(Population_per_square_kilometre^(1/3)), 
+                data = LonWard_WB_SP, 
+                coords=coordsWSP, 
+                adapt=GWRbandwidth, 
+                hatmatrix=TRUE, 
+                se.fit=TRUE)
+
+#print the results of the model
+gwr.model 
+
+
+```
+To visually investigate the spatial variation in these associations, the coefficients for each variable were mapped, to reveal strength variation in terms of well-being outcome scores. Taking map (a), we can see that for the majority of wards in London, there is the positive relationship we would expect, as median household income goes up, well-being score increases. Results for population density coefficients are more ambivalent in map (b), an increased population density would mildly impact most wards’ well-being scores either positively or negatively, however, decreases are more frequent and have a more significant magnitude, like in north London, in East Finchley for example. 
+``` {r   warning=FALSE, message=FALSE, fig.align="center"} 
+
+results <- as.data.frame(gwr.model$SDF)
+
+#attach coefficients to original SF
+LonWard_WB_score_IV2 <- LonWard_WB_score_IV %>%
+  mutate( coefHhincome = results$I.inc_hh_median..1.3..,
+          coefpopdensity = results$I.Population_per_square_kilometre..1.3..)
+
+
+#run the significance test
+sigTest = gwr.model$SDF$"I.inc_hh_median..1.3.." / gwr.model$SDF$"I.inc_hh_median..1.3.._se"
+
+#store significance results
+LonWard_WB_score_IV2 <- LonWard_WB_score_IV2 %>%
+  mutate(GWRhhincSig = sigTest)
+
+# map  report  GWR coeff hh income Sig
+tmap_mode("plot")
+GWRcoeffIncmap <- tm_shape(LonWard_WB_score_IV2) +
+  tm_polygons ("GWRhhincSig", palette="-RdYlBu", popup.vars=c("NAME", "WB_score_2013", "GWRhhincSig"),  title="GWR significant Coefficient Household Income") +
+  tm_layout (legend.outside = TRUE)
+GWRcoeffIncmap
+
+summary(LonWard_WB_score_IV2$GWRhhincSig)
+
+# same with pop density
+# Sig test pop density from Bristol ac uk 
+t2 = gwr.model$SDF$"I.Population_per_square_kilometre..1.3.." / gwr.model$SDF$"I.Population_per_square_kilometre..1.3.._se"
+
+#store significance results
+LonWard_WB_score_IV2 <- LonWard_WB_score_IV2 %>%
+  mutate(GWRpopdensSigt2 = t2)
+
+#plot
+# tmap_mode("plot")
+GWRcoefPopmap <- tm_shape(LonWard_WB_score_IV2) +
+  tm_polygons(col = "GWRpopdensSigt2",
+              palette = "-RdYlBu",  popup.vars=c("NAME", "WB_score_2013", "GWRpopdensSigt2"), title="GWR significant Coefficient Population Density")+
+  tm_layout( legend.outside = T)
+GWRcoefPopmap
+
+summary(LonWard_WB_score_IV2$GWRpopdensSigt2)
+
+# here areas in blue are areas where WB would go down as pop density increases (like in lm), 
+# and area in yellow / orange where WB would go up if pop density was higher. (?)
+```
+
+##	Discussion 
+
+###		Well-being’s spatial variation
+
+Moran’s I test showed significant spatial autocorrelation in the distribution of well-being scores across London wards. Local authorities and policy makers could direct their efforts towards the wards of Enfield, Walthamstow, Stratford, Barking, Peckham, and Heathrow for example, as G*i statistics indicated they are pockets of relatively low well-being scores. 
+
+The most important finding in the linear regression model was the significant correlations
+between household income, population density and well-being. Higher household income correlated with higher well-being, which corresponds to results from similar studies (Ballas, 2013; Stanca, 2010). On the other hand, it appeared higher population density had an overall negative impact on well-being scores in London, which was also suggested in previous studies (Li and Kanazawa, 2016).
+
+The GWR model results show that the geographical variation in the explanatory variable ‘household median income’ is overall positively associated with higher well-being. This relationship appears to be stronger on the outer skirt of London, as when median household income goes up, subjective well-being increases relatively more than in the centre. For example, areas around West Wickham and Eden Park in the South, and Chadwell Heath in the east show the strongest well-being score increase. There are a few exceptions to this relationship, notably a cluster in east London with Bethnal Green, Stratford, and West Ham showing contrary results, meaning higher household income would not positively affect well-being. These areas were clusters of low well-being scores in the G*i Statistics, so it is plausible a sole increase in household income would not be enough to bring well-being scores up, when other indicators of deprivation are playing out (London.gov.uk, n.d.). The GWR coefficients for the population density variable indicate higher population density has an overall negative effect on well-being. This may be related to higher crime rates, a feeling of insecurity or higher inequalities in these wards (Rajendran et al., 2020).
+
+###	Opportunities for the London well-being index
+
+Because household income correlates with well-being scores so strongly and is a variable that is widely used in research and other urban well-being measures, it is quite surprising GLA did not integrate it to its 2013 calculations. Doing so would enhance the representation and measurement of people’s quality of life. The inclusion of a population density indicator in the index would require further analysis, to clarify the spatial variation of its association with well-being. Looking at it in conjunction with deprivation like Rajendran et al. (2020), could be helpful. If these two variables were to be included in the GLA model, their impact on the well-being scores would probably be milder than they appear in the GWR coefficient maps as they would then be one of many indicators.
+Household income and population density are arguably difficult to supervise for a local council. Nonetheless, decision makers could take these indicators into account when thinking about the local economy, or housing estates for example (London Councils, n.d.). Plus, having a more accurate measure of well-being, which potentially includes household income and population density, means the effect of other indicators within the model would be modified, and so local authorities' priorities could change accordingly. 
+This exploratory analysis of well-being variation across London could be taken further by looking at other indicators whose association with well-being is already established. Ala-Mantila et al. (2017) have examined the relationship between built density in terms of gross floor space taken up by residential buildings and well-being. Similarly, the GLA index includes access to open green space, but research suggests the size, type and quality of green space matters too, so further analysis in that direction could enhance the model (Houlden et al., 2019; Zhang et al., 2017).
+
+
+
+
+##		Conclusion
+
+This study aimed to enhance the understanding and measure of well-being across London, so as to support policy work orientated towards the improvement of citizens’ lives. Its exploratory approach sought to examine the relationship between two variables, households median income and population density, and the GLA 2013 well-being scores through linear and geographically weighted regressions. While the 2013 well-being index did not include individual or household income, this study found that it was particularly relevant and significant to explain well-being variation across London wards. The association between population density and well-being scores was weaker than the latter, and demonstrated more variation across the city, which highlights its fluctuating importance for well-being. Further investigation of this association would be necessary before consequential inferences are made from it. These findings suggest that including household income, and potentially population density in the GLA well-being index presents opportunities to enhance it, and support policy makers’ efforts towards making London a more liveable city. Beyond the opportunities this research bears for London, better understanding urban well-being is meaningful for other cities in the UK and further afield.
+
+
+##	References
+
+References 
+
+Adler, A. and Seligman, M.E., (2016). ‘Using wellbeing for public policy: Theory, measurement, and recommendations’. International journal of wellbeing, 6(1), pp.1-35. [Online] Available at: https://internationaljournalofwellbeing.org/index.php/ijow/article/view/429
+
+Ala-Mantila, S. et al. (2017) ‘Spatial nature of urban well-being’, Regional Studies. Routledge, 52(7), pp. 959–973. [Online] Available at: https://www.tandfonline.com/doi/full/10.1080/00343404.2017.1360485 
+
+ArcGIS Pro, n.d. How Geographically Weighted Regression (GWR) Works. [Online] Pro.arcgis.com. Available at: https://pro.arcgis.com/en/pro-app/latest/tool-reference/spatial-statistics/how-geographicallyweightedregression-works.htm 
+
+Ballas, D., (2013). ‘What makes a ‘happy city’?’. Cities, 32, pp.S39-S50. [Online] Available at:  https://www.sciencedirect.com/science/article/pii/S0264275113000504?via%3Dihub
+
+Brunsdon, C., Fotheringham, A.S. and Charlton, M.E., (1996). ‘Geographically weighted regression: a method for exploring spatial nonstationarity’. Geographical analysis, 28(4), pp.281-298. [Online] Available at:  https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1538-4632.1996.tb00936.x 
+
+Chen, D. R., and Truong, K. (2012). ‘Using multilevel modeling and geographically weighted regression to identify spatial variations in the relationship between place-level disadvantages and obesity in Taiwan’. Applied Geography, 32(2), pp.737-745. [Online] Available at: https://www.sciencedirect.com/science/article/pii/S0143622811001597
+
+Dempsey, N., Brown, C., and Bramley, G. (2012). ‘The key to sustainable urban development in UK cities? The influence of density on social sustainability’. Progress in Planning, 77(3), pp.89–141. https://www.sciencedirect.com/science/article/pii/S0305900612000189
+
+Dodge, R., Daly, A., Huyton, J., and Sanders, L. (2012). ‘The challenge of defining wellbeing’. International Journal of Wellbeing, 2(3), pp. 222-235. [Online] Available at:  https://www.internationaljournalofwellbeing.org/index.php/ijow/article/view/89
+
+Field, A., (2012). Assumptions Part 2: Homogeneity Of Variance/Homoscedasticity. Discovering Statistics. [Online] Available at: https://www.discoveringstatistics.com/tag/homoscedasticity/ 
+
+Fotheringham, A. S., Brunsdon, C., and Charlton, M. (2003). Geographically weighted regression: the analysis of spatially varying relationships. John Wiley & Sons. [Online] Available at: https://www.researchgate.net/publication/27246972_Geographically_Weighted_Regression_The_Analysis_of_Spatially_Varying_Relationships 
+
+Greater London Authority (2012) ‘Well-being in London : Measurement and Use’, GLA Economics. [Online] Available at: https://demo.london.gov.uk/sites/default/files/gla_migrate_files_destination/cin35_0.pdf
+
+Harley, F. and Knight, F., (2020). The City Wellbeing Index: How Happy Are The World's Leading Cities? [Online] Knightfrank.com. Available at: https://www.knightfrank.com/wealthreport/article/2020-03-03-the-city-wellbeing-index-how-happy-are-the-worlds-leading-cities
+
+Houlden, V. et al. (2019) ‘A spatial analysis of proximate greenspace and mental wellbeing in London’, Applied Geography. Elsevier Ltd, 109, pp. 1-8 [Online] Available at: https://www.sciencedirect.com/science/article/pii/S0143622818312384
+
+Li,N.P., and Kanazawa, S. (2016). ‘Country Roads, take me home…to my friends: How intelligence, population density, and friendship affect modern happiness’. British Journal of Psychology, 107(4), pp. 675–697 [Online] Available at: https://pubmed.ncbi.nlm.nih.gov/26847844/
+
+London Councils, (n.d.) Improving Lives In London. [Online] Londoncouncils.gov.uk. Available at: https://www.londoncouncils.gov.uk/who-runs-london/boroughs-community/improving-lives-london
+
+London DataStore, (2013). London Ward Well-Being Scores. [online] London DataStore. Available at: https://data.london.gov.uk/dataset/london-ward-well-being-scores
+
+London.gov.uk. (n.d.) Persistent Problems Of Poverty And Disadvantage. [Online] Available at: https://www.london.gov.uk/what-we-do/planning/london-plan/current-london-plan/london-plan-chapter-one-context-and-strategy-3
+
+Office for National Statistics, (2019). Measures Of National Well-Being Dashboard. [online] Ons.gov.uk. Available at: https://www.ons.gov.uk/peoplepopulationandcommunity/wellbeing/articles/measuresofnationalwellbeingdashboard/2018-04-25
+
+Ogneva-Himmelberger, Y., Pearsall, H., and Rakshit, R. (2009). ‘Concrete evidence & geographically weighted regression: A regional analysis of wealth and the land cover in Massachusetts’. Applied Geography, 29(4), pp.478-487. [Online] Available at: https://www.sciencedirect.com/science/article/pii/S0143622809000253
+
+Pineo, H.,  Zimmermann, N.,  Cosgrave, E.,  Aldridge, R.,  Acuto, M. and Rutter, H. (2018) ‘Promoting a healthy cities agenda through indicators: development of a global urban environment and health index’  Cities & Health, (2)1, pp. 27-45   [Online] Available at: https://www.tandfonline.com/doi/full/10.1080/23748834.2018.1429180 
+
+Rajendran, L. P. et al. (2020) ‘A socio-spatial approach to enable inclusive well-being in cities: A case study of Birmingham, UK’, Social Sciences, 9(6), pp.1-14  [Online] Available at: https://www.researchgate.net/publication/342431543_A_Socio-Spatial_Approach_to_Enable_Inclusive_Well-Being_in_Cities_A_Case_Study_of_Birmingham_UK
+
+Stanca, L. (2010) ‘The Geography of Economics and Happiness: Spatial Patterns in the Effects of Economic Conditions on Well-Being’, Social Indicators Research, 99(1), pp. 115–133. [Online] Available at: https://www.researchgate.net/publication/227330143_The_Geography_of_Economics_and_Happiness_Spatial_Patterns_in_the_Effects_of_Economic_Conditions_on_Well-Being
+
+Veneri, P. and Edzes, A. J. E. (2017) ‘Well-being in cities and regions: measurement, analysis and policy practices’, REGION, 4(2), pp. E1-E5. [Online] Available at: https://openjournals.wu.ac.at/ojs/index.php/region/article/view/188
+
+Zhang, Y. et al. (2017) ‘Quality over Quantity: Contribution of Urban Green Space to Neighborhood Satisfaction’, International Journal of Environmental Research and Public Health. MDPI AG, 14(5), p. 1-10. [Online] Available at: http://www.mdpi.com/1660-4601/14/5/535 
+
+
+
+
