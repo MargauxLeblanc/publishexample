@@ -106,7 +106,8 @@ library(sjPlot)
 library(sjmisc)
 library(sjlabelled)
 library(ggpubr)
-
+library(knitr)
+library(webshot)
 
 # load spatial data 
 Londonwards <-  st_read( "Assignment_final/data/statistical-gis-boundaries-london/ESRI/London_Ward_CityMerged.shp")

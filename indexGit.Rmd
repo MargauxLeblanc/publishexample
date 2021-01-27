@@ -107,6 +107,8 @@ library(sjPlot)
 library(sjmisc)
 library(sjlabelled)
 library(ggpubr)
+library(knitr)
+library(webshot)
 
 
 # load spatial data 
