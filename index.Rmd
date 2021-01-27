@@ -177,7 +177,7 @@ breaks1<-c(-1000,-2.58,-1.96,-1.65,1.65,1.96,2.58,1000)
 GIColours<- rev(brewer.pal(8, "RdBu"))
 
 # plot Getis Ord on an interactive map
-tmap_mode("view")
+tmap_mode("plot")
 GetisOrdmap <- tm_shape(LonWard_WB_score) +
   tm_polygons ("density_G", style="fixed", breaks=breaks1, palette=GIColours, popup.vars=c("NAME", "WB_score_2013", "density_G"),  title="Getis Ord Gi, Well-Being Score in London") +
   tm_layout (legend.outside = TRUE)
@@ -331,7 +331,7 @@ tidy(DW)
 #now plot the residuals (of lm model)
 # get interactive output 
 
-tmap_mode("view")
+tmap_mode("plot")
 LMresidualsmap <- tm_shape(LonWard_WB_score_IV) +
   tm_polygons ("model2resids", palette="-RdYlBu", popup.vars=c("NAME", "WB_score_2013", "model2resids"),  title="Linear Model Residuals") +
   tm_layout (legend.outside = TRUE)
@@ -438,7 +438,7 @@ LonWard_WB_score_IV2 <- LonWard_WB_score_IV2 %>%
   mutate(GWRhhincSig = sigTest)
 
 # map  report  GWR coeff hh income Sig
-tmap_mode("view")
+tmap_mode("plot")
 GWRcoeffIncmap <- tm_shape(LonWard_WB_score_IV2) +
   tm_polygons ("GWRhhincSig", palette="-RdYlBu", popup.vars=c("NAME", "WB_score_2013", "GWRhhincSig"),  title="GWR significant Coefficient Household Income") +
   tm_layout (legend.outside = TRUE)
@@ -455,7 +455,7 @@ LonWard_WB_score_IV2 <- LonWard_WB_score_IV2 %>%
   mutate(GWRpopdensSigt2 = t2)
 
 #plot
-# tmap_mode("view")
+# tmap_mode("plot")
 GWRcoefPopmap <- tm_shape(LonWard_WB_score_IV2) +
   tm_polygons(col = "GWRpopdensSigt2",
               palette = "-RdYlBu",  popup.vars=c("NAME", "WB_score_2013", "GWRpopdensSigt2"), title="GWR significant Coefficient Population Density")+
